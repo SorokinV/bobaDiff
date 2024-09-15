@@ -13,8 +13,14 @@ class HTMLParser(HTMLParser):
     ll = []
     au = []
     mc = hashlib.sha256()
-    cc = ('class', 'name', 'id')
+    cc = ('class', )# 'name','id','type','defer','title','role','rel','src',) 'action',) #'variant') #,'data-hovercard-url')
     aappend = False
+
+    def __init__(self):
+        super().__init__()
+        self.nn = 0
+        self.ll = []
+        self.av = []
 
     def handle_starttag(self, tag, attrs):
         if tag=='html':
@@ -42,16 +48,12 @@ class HTMLParser(HTMLParser):
             print('bb',tag,self.nn)
             print(attrs)
         '''
-        '''    
+
         nu = [attr[0] for attr in attrs if attr[0] not in self.au]
         self.au.extend(nu)
-        '''
+
 
     def handle_endtag(self, tag):
-        """
-        if tag=='head' or tag=='body' or tag=='html':
-            print('ee',tag,self.nn)
-        """
         self.nn -= 1
 
     #def handle_data(self, data):
@@ -66,7 +68,7 @@ def refine (rn):
 
     #print(parser.nn)
     #print(parser.ll)
-    #print(len(parser.au),parser.au)
+    print(len(parser.au), parser.au)
     return parser.ll
 
 
@@ -80,14 +82,15 @@ def to2files():
     """
     r1 = file('https://github.com/NelliSm/Sprint_5/pulls')
     nlist1 = refine(r1.content.replace(b'\n',b''))
+    #r2 = file('https://github.com/SorokinV/bobaDiff/pulls')
     r2 = file('https://github.com/SorokinV/bobaDiff/pulls')
     nlist2 = refine(r2.content.replace(b'\n',b''))
-
-    f1 = open(a1, 'wt')
-    ffff = [f1.write(f'{str(rr[0])} {rr[1]} {rr[2]})') for rr in r1]
+    print(len(nlist1),len(nlist2))
+    f1 = open(a1, 'w')
+    ffff = [print(f'{str(rr[0])} {rr[1]} {rr[2]})', file=f1) for rr in nlist1]
     f1.close()
-    f2 = open(a2, 'wt')
-    ffff = [f2.write(f'{str(rr[0])} {rr[1]} {rr[2]})') for rr in r2]
+    f2 = open(a2, 'w')
+    ffff = [print(f'{str(rr[0])} {rr[1]} {rr[2]})', file=f2) for rr in nlist2]
     f2.close()
 
     """
@@ -126,11 +129,19 @@ def fcompare(f1name, f2name):
     if not f1 or not f2:
         return 0
 
+    ab = []
+    ii = 0
     a = f1.readlines(); f1.close()
     b = f2.readlines(); f2.close()
     for line in difflib.ndiff(a, b):
-        print(line, end=' ')
+        abt = line[0:2]
+        if abt != '  ':
+            ii += 1
+            print(ii,line, end=' ')
 
+        if abt not in ab :
+            ab.append(abt)
+    print(ab)
     return 1
 
 # crack args (sys.argv[1:] is normal) & compare;
@@ -144,6 +155,9 @@ def main(args):
         return fail(str(detail))
     noisy = 1
     qseen = rseen = 0
+
+    print(opts, args)
+
     for opt, val in opts:
         if opt == "-q":
             qseen = 1
@@ -181,3 +195,4 @@ def restore(which):
 
 if __name__ == '__main__':
     main(sys.argv[1:])
+    #main(['-q', '0'])
